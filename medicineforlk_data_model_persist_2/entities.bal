@@ -29,7 +29,7 @@ public enum PledgeStatus {
 }
 
 @persist:Entity {
-    id: ["id"],
+    id: ["name"],
     unique: ["supplierId"]
 }
 public type Supplier record {|
