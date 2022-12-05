@@ -1,0 +1,8 @@
+[package]
+org = "sameera"
+name = "medicineforlk_data_model_persist_2"
+version = "0.1.0"
+distribution = "2201.3.0-rc2.2"
+
+[build-options]
+observabilityIncluded = true
