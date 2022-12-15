@@ -22,6 +22,7 @@ public type IDConfig record {|
 public const annotation IDConfig Id on record field;
 
 public type UniqueConfig record {|
+    string name?;
     SortOrder sort?;
 |};
 
