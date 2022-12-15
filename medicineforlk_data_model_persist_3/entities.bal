@@ -32,7 +32,7 @@ public enum PledgeStatus {
 public type Supplier record {|
     @persist:AutoIncrement
     @persist:Id
-    int supplierId;
+    readonly int supplierId = -1;
     @persist:Unique
     string name;
     string shortName; 
@@ -46,7 +46,7 @@ public type Supplier record {|
 public type MedicalItem record {|
     @persist:AutoIncrement
     @persist:Id
-    int itemId;
+    readonly int itemId = -1;
     @persist:Unique
     string name;
     @persist:Unique
@@ -61,7 +61,7 @@ public type MedicalItem record {|
 public type Beneficiary record {|
     @persist:AutoIncrement
     @persist:Id
-    int beneficiaryId;
+    readonly int beneficiaryId = -1;
     @persist:Unique
     string name;
     string shortName;
@@ -75,7 +75,7 @@ public type Beneficiary record {|
 public type Donar record {|
     @persist:AutoIncrement
     @persist:Id
-    int donarId;
+    readonly int donarId = -1;
     @persist:Unique
     string orgName;
     string orgLink;
@@ -89,7 +89,7 @@ public type Donar record {|
 public type MedicalNeed record {|
     @persist:AutoIncrement
     @persist:Id
-    int needId;
+    readonly int needId = -1;
 
     @persist:Unique
     int itemId;
@@ -114,7 +114,7 @@ public type MedicalNeed record {|
 public type Quotation record {|
     @persist:AutoIncrement
     @persist:Id
-    int quotationId;
+    readonly int quotationId = -1;
 
     @persist:Unique
     int supplierId;
@@ -142,7 +142,7 @@ public type Quotation record {|
 public type AidPackage record {|
     @persist:AutoIncrement
     @persist:Id
-    int packageId;
+    readonly int packageId = -1;
     string name;
     string description;
     time:Civil datatime; 
@@ -161,7 +161,7 @@ public type AidPackage record {|
 public type AidPackageItem record {|
     @persist:AutoIncrement
     @persist:Id
-    int packageItemId;
+    readonly int packageItemId = -1;
 
     @persist:Unique
     int qoutationId;
@@ -186,7 +186,7 @@ public type AidPackageItem record {|
 public type AidPackageUpdate record {|
     @persist:AutoIncrement
     @persist:Id 
-    int packageUpdateId;
+    readonly int packageUpdateId = -1;
     @persist:Unique
     int packageId;
 
@@ -201,7 +201,7 @@ public type AidPackageUpdate record {|
 public type Pledge record {|
     @persist:AutoIncrement
     @persist:Id
-    int pledgeId;
+    readonly int pledgeId = -1;
 
     @persist:Unique
     int packageId;
@@ -223,7 +223,7 @@ public type Pledge record {|
 public type PledgeUpdate record {|
     @persist:AutoIncrement
     @persist:Id 
-    int pledgeUpdateId;
+    readonly int pledgeUpdateId = -1;
     @persist:Unique
     int pledgeId;
     string updateComment;
@@ -236,7 +236,7 @@ public type PledgeUpdate record {|
 public type MedicalNeedUpdate record {|
     @persist:AutoIncrement
     @persist:Id
-    int updateId;
+    readonly int updateId = -1;
 
     time:Civil datatime;
     time:Civil lastUpdatedTIME;
