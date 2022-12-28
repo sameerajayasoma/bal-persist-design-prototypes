@@ -134,7 +134,7 @@ modules = [
 
 [[package]]
 org = "sameera"
-name = "mysql_employees_sample"
+name = "rainier_sample"
 version = "0.1.0"
 dependencies = [
 	{org = "ballerina", name = "io"},
@@ -144,7 +144,7 @@ dependencies = [
 	{org = "ballerinai", name = "observe"}
 ]
 modules = [
-	{org = "sameera", packageName = "mysql_employees_sample", moduleName = "mysql_employees_sample"}
+	{org = "sameera", packageName = "rainier_sample", moduleName = "rainier_sample"}
 ]
 
 

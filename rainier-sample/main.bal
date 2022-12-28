@@ -7,6 +7,9 @@ public function main() returns error? {
     Department engeeringDept = check rainier->/departments.insert({deptName: "Engineering"});
     io:println("Inserted department: ", engeeringDept);
 
+    // Inserting an employee with a reference to the deptNo 
+    // Inserting an employee with a non department is not yet supported.
+    // Similarly, inserting a department with references to non-existing employees is not yet supported.
     _ = check rainier->/employees.insert({
         firstName: "Jack",
         lastName: "Ryan",

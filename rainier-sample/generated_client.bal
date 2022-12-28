@@ -1,13 +1,16 @@
 import ballerina/uuid;
 import ballerina/time;
 
-enum Gender {
+// TODO: Remove "public" from the generated types
+// I've added the "public" qualifier to get-rid of the several warnings in the client class
+// TODO: Report an issue to the compiler team
+public enum Gender {
     M,
     F
 }
 
 // Generated model types
-type Employee record {|
+public type Employee record {|
     readonly string empNo;
     string firstName;
     string lastName;
@@ -18,17 +21,17 @@ type Employee record {|
     string deptNo; // department primary key
 |};
 
-type Department record {|
+public type Department record {|
     readonly string deptNo;
     string deptName;
 |};
 
 // Insert-related generated types
-type DepartmentInsert record {|
+public type DepartmentInsert record {|
     string deptName;
 |};
 
-type EmployeeInsert record {|
+public type EmployeeInsert record {|
     string firstName;
     string lastName;
     time:Date birthDate;
@@ -39,11 +42,11 @@ type EmployeeInsert record {|
 |};
 
 // Update-related generated types
-type DepartmentUpdate record {|
+public type DepartmentUpdate record {|
     string deptName?;
 |};
 
-type EmployeeUpdate record {|
+public type EmployeeUpdate record {|
     string firstName?;
     string lastName?;
     time:Date birthDate?;
