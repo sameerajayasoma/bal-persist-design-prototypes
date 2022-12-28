@@ -1,0 +1,16 @@
+[package]
+org = "sameera"
+name = "rainier_sample"
+version = "0.1.0"
+distribution = "2201.3.0"
+
+[build-options]
+observabilityIncluded = true
+
+[persist.rainier]
+provider = "mysql"
+host = ""
+port = 3307
+user = ""
+password = ""
+database = "rainier"
