@@ -151,12 +151,26 @@ public type EmployeeUpdate record {|
     string deptNo?; // department primary key
 |};
 
-public type EmployeeUniqueKey record {|
+public type SalaryUpdate record {|
+    int salary?;
+    time:Date toDate?;
+|};
+
+public type TitleUpdate record {|
+    time:Date toDate?;
+|};
+
+public type EmployeeUniqueKey readonly & record {|
     string empNo;
 |};
 
-public type DepartmentUniqueKey record {|
+public type DepartmentUniqueKey readonly & record {|
     string deptNo;
+|};
+
+public type SalaryUniqueKey readonly & record {|
+    string empNo;
+    time:Date fromDate;
 |};
 
 public type TitleUniqueKey readonly & record {|

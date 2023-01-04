@@ -129,8 +129,93 @@ client class RainierClient {
         }
     }
 
+    resource function 'select salaries() returns stream<Salary, error?> {
+        return self.salaries.toArray().toStream();
+    }
+
+    resource function insert salaries(SalaryInsert data) returns Salary|error {
+        string empNo;
+        string|EmployeeInsertWithoutSalaries employee = data.employee;
+        if employee is string {
+            empNo = employee;
+            if !self.employees.hasKey(empNo) {
+                return error("Insert failed: Employee not found", empNo = empNo);
+            }
+        } else {
+            Employee emp = check self.insertEmployee(employee);
+            empNo = emp.empNo;
+        }
+
+        Salary salary = {empNo: empNo, salary: data.salary, fromDate: data.fromDate.cloneReadOnly(), toDate: data.toDate};
+        self.salaries.add(salary);
+        return salary;
+    }
+
+    resource function update salaries(SalaryUniqueKey uniqueKey, SalaryUpdate data) returns Salary|error {
+        Salary? salary = self.salaries[uniqueKey.empNo, uniqueKey.fromDate];
+        if salary is () {
+            return error("Update failed: Salary not found", empNo = uniqueKey.empNo);
+        }
+
+        int? salaryValue = data.salary;
+        if salaryValue is int {
+            salary.salary = salaryValue;
+        }
+
+        time:Date? toDate = data.toDate;
+        if toDate is time:Date {
+            salary.toDate = toDate;
+        }
+
+        return salary;
+    }
+
+    resource function delete salaries(SalaryUniqueKey uniqueKey) returns Salary|error {
+        Salary? salary = self.salaries.remove([uniqueKey.empNo, uniqueKey.fromDate]);
+        if salary is Salary {
+            return salary;
+        } else {
+            return error("Delete failed: Salary not found", salaryKey = uniqueKey);
+        }
+    }
+
+    resource function 'select titles() returns stream<Title, error?> {
+        return self.titles.toArray().toStream();
+    }
+
+    resource function insert titles(TitleInsert data) returns Title|error {
+        string empNo;
+        string|EmployeeInsertWithoutTitles employee = data.employee;
+        if employee is string {
+            empNo = employee;
+            if !self.employees.hasKey(empNo) {
+                return error("Insert failed: Employee not found", empNo = empNo);
+            }
+        } else {
+            Employee emp = check self.insertEmployee(employee);
+            empNo = emp.empNo;
+        }
+
+        Title title = {empNo: empNo, title: data.title, fromDate: data.fromDate.cloneReadOnly(), toDate: data.toDate};
+        self.titles.add(title);
+        return title;
+    }
+
+    resource function update titles(TitleUniqueKey uniqueKey, TitleUpdate data) returns Title|error {
+        Title? title = self.titles[uniqueKey.empNo, uniqueKey.title, uniqueKey.fromDate];
+        if title is () {
+            return error("Update failed: Title not found", empNo = uniqueKey.empNo);
+        }
+        time:Date? toDate = data.toDate;
+        if toDate is time:Date {
+            title.toDate = toDate;
+        }
+
+        return title;
+    }
+
     // Define type for the uniqueKey param type
-    resource function delete title(TitleUniqueKey uniqueKey) returns Title|error {
+    resource function delete titles(TitleUniqueKey uniqueKey) returns Title|error {
         Title? title = self.titles.remove([uniqueKey.empNo, uniqueKey.title, uniqueKey.fromDate]);
         if title is Title {
             return title;
