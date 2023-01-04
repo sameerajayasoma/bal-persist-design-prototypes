@@ -16,7 +16,7 @@ public function main() returns error? {
         birthDate: {year: 1976, month: 4, day: 23},
         gender: M,
         hireDate: {year: 2019, month: 12, day: 23},
-        deptNo: engeeringDept.deptNo
+        department: engeeringDept.deptNo
     });
 
     // Insert many 
@@ -27,11 +27,12 @@ public function main() returns error? {
     int count = check rainier->/departments.insertMany(deptInserts);
     io:println(string `Inserted ${count} departments`);
 
+    // Projection
     string[] deptNos = check from var dept in rainier->/departments.'select()
         select dept.deptNo;
 
     // Inserting 100 employees
-    EmployeeInsert[] empInserts = from var _ in 1...100
+    EmployeeInsert[] empInserts = from var _ in 1 ... 100
         select check randomEmployee(deptNos);
     count = check rainier->/employees.insertMany(empInserts);
     io:println(string `Inserted ${count} employees`);
@@ -49,11 +50,11 @@ public function main() returns error? {
     if employees.length() > 0 {
         // Update
         Employee emp = employees[0];
-        Employee updatedEmp = check rainier->/employees.update(empNo = emp.empNo, data = {lastName: "Doe"});
+        Employee updatedEmp = check rainier->/employees.update(uniqueKey = {empNo: emp.empNo}, data = {lastName: "Doe"});
         io:println("Updated employee: ", updatedEmp);
 
         // Delete
-        Employee deletedEmp = check rainier->/employees.delete(emp.empNo);
+        Employee deletedEmp = check rainier->/employees.delete(uniqueKey = {empNo: emp.empNo});
         io:println("Deleted employee: ", deletedEmp);
     }
 }

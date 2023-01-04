@@ -9,7 +9,7 @@ function randomEmployee(string[] depts) returns EmployeeInsert|error => {
     birthDate: check randomBirthDate(),
     gender: check randomGender(),
     hireDate: check randomHireDate(),
-    deptNo: check randomDepartment(depts)
+    department: check randomDepartment(depts)
 };
 
 function randomDepartment(string[] departments) returns string|error {

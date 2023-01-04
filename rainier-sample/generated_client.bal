@@ -1,99 +1,33 @@
 import ballerina/uuid;
 import ballerina/time;
 
-// TODO: Remove "public" from the generated types
-// I've added the "public" qualifier to get-rid of the several warnings in the client class
-// TODO: Report an issue to the compiler team
-public enum Gender {
-    M,
-    F
-}
-
-// Generated model types
-public type Employee record {|
-    readonly string empNo;
-    string firstName;
-    string lastName;
-    time:Date birthDate;
-    Gender gender;
-    time:Date hireDate;
-
-    string deptNo; // department primary key
-|};
-
-public type Department record {|
-    readonly string deptNo;
-    string deptName;
-|};
-
-// Insert-related generated types
-public type DepartmentInsert record {|
-    string deptName;
-|};
-
-public type EmployeeInsert record {|
-    string firstName;
-    string lastName;
-    time:Date birthDate;
-    Gender gender;
-    time:Date hireDate;
-
-    string deptNo; // department primary key
-|};
-
-// Update-related generated types
-public type DepartmentUpdate record {|
-    string deptName?;
-|};
-
-public type EmployeeUpdate record {|
-    string firstName?;
-    string lastName?;
-    time:Date birthDate?;
-    Gender gender?;
-    time:Date hireDate?;
-
-    string deptNo?; // department primary key
-|};
-
 client class RainierClient {
     private final table<Employee> key(empNo) employees = table [];
     private final table<Department> key(deptNo) departments = table [];
+    private final table<Salary> key(empNo, fromDate) salaries = table [];
+    private final table<Title> key(empNo, title, fromDate) titles = table [];
 
     resource function 'select employees() returns stream<Employee, error?> {
         return self.employees.toArray().toStream();
     }
 
     resource function insert employees(EmployeeInsert data) returns Employee|error {
-        Department? dept = self.departments[data.deptNo];
-        if dept is () {
-            return error("Insert failed: Department not found", deptNo = data.deptNo);
-        }
-
-        Employee employee = {empNo: uuid:createType4AsString(), ...data};
-        self.employees.add(employee);
-        return employee;
+        return self.insertEmployee(data);
     }
 
     resource function insertMany employees(EmployeeInsert[] employeeInserts) returns int|error {
         int count = 0;
         foreach EmployeeInsert data in employeeInserts {
-            Department? dept = self.departments[data.deptNo];
-            if dept is () {
-                return error("Insert failed: Department not found", deptNo = data.deptNo);
-            }
-
-            Employee employee = {empNo: uuid:createType4AsString(), ...data};
-            self.employees.add(employee);
+            var _ = check self.insertEmployee(data);
             count += 1;
         }
         return count;
     }
 
-    resource function update employees(string empNo, EmployeeUpdate data) returns Employee|error {
-        Employee? employee = self.employees[empNo];
+    resource function update employees(EmployeeUniqueKey uniqueKey, EmployeeUpdate data) returns Employee|error {
+        Employee? employee = self.employees[uniqueKey.empNo];
         if employee is () {
-            return error("Update failed: Employee not found", empNo = empNo);
+            return error("Update failed: Employee not found", empNo = uniqueKey.empNo);
         }
 
         string? deptNo = data.deptNo;
@@ -111,7 +45,7 @@ client class RainierClient {
         }
 
         string? lastName = data.lastName;
-        if lastName is string  {
+        if lastName is string {
             employee.lastName = lastName;
         }
 
@@ -136,12 +70,12 @@ client class RainierClient {
     // resource function updateMany employees(){
     // }
 
-    resource function delete employees(string empNo) returns Employee|error {
-        Employee? employee = self.employees.remove(empNo);
+    resource function delete employees(EmployeeUniqueKey uniqueKey) returns Employee|error {
+        Employee? employee = self.employees.remove(uniqueKey.empNo);
         if employee is Employee {
             return employee;
         } else {
-            return error("Delete failed: Employee not found", empNo = empNo);
+            return error("Delete failed: Employee not found", empNo = uniqueKey.empNo);
         }
     }
 
@@ -154,25 +88,28 @@ client class RainierClient {
 
     resource function insert departments(DepartmentInsert data) returns Department|error {
         // TODO: validate referential integrity
-        Department dept = {deptNo: uuid:createType4AsString(), ...data};
+        Department dept = {deptNo: uuid:createType4AsString(), deptName: data.deptName};
         self.departments.add(dept);
+
+        // TODO: insert employees if any
         return dept;
     }
 
     resource function insertMany departments(DepartmentInsert[] data) returns int|error {
         int count = 0;
         foreach DepartmentInsert deptInsert in data {
-            self.departments.add({deptNo: uuid:createType4AsString(), ...deptInsert});
+            self.departments.add({deptNo: uuid:createType4AsString(), deptName: deptInsert.deptName});
             count += 1;
         }
         return count;
     }
 
-
-    resource function update departments(string deptNo, DepartmentUpdate data) returns Department|error {
-        Department? dept = self.departments[deptNo];
+    // There can be more than one way to uniquely identify a department, hence the where clause to identify the department
+    // resource function update departments(DepartmentUnique where, DepartmentUpdate data) returns Department|error {
+    resource function update departments(DepartmentUniqueKey uniqueKey, DepartmentUpdate data) returns Department|error {
+        Department? dept = self.departments[uniqueKey.deptNo];
         if dept is () {
-            return error("Update failed: Department not found", deptNo = deptNo);
+            return error("Update failed: Department not found", deptNo = uniqueKey.deptNo);
         }
 
         string? deptName = data.deptName;
@@ -182,12 +119,53 @@ client class RainierClient {
         return dept;
     }
 
-    resource function delete departments(string deptNo) returns Department|error {
-        Department? dept = self.departments.remove(deptNo);
+    // Think of a better name of the uniqueKey param name
+    resource function delete departments(DepartmentUniqueKey uniqueKey) returns Department|error {
+        Department? dept = self.departments.remove(uniqueKey.deptNo);
         if dept is Department {
             return dept;
         } else {
-            return error("Delete failed: Department not found", deptNo = deptNo);
+            return error("Delete failed: Department not found", deptNo = uniqueKey.deptNo);
         }
+    }
+
+    // Define type for the uniqueKey param type
+    resource function delete title(TitleUniqueKey uniqueKey) returns Title|error {
+        Title? title = self.titles.remove([uniqueKey.empNo, uniqueKey.title, uniqueKey.fromDate]);
+        if title is Title {
+            return title;
+        } else {
+            return error("Delete failed: Title not found", titleKey = uniqueKey);
+        }
+    }
+
+    private function insertEmployee(EmployeeInsert data) returns Employee|error {
+        string deptNo;
+        string|DepartmentInsertWithoutEmployees department = data.department;
+        if department is string {
+            deptNo = department;
+            Department? dept = self.departments[department];
+            if dept is () {
+                return error("Insert failed: Department not found", deptNo = department);
+            }
+
+        } else {
+            DepartmentInsertWithoutEmployees deptInsert = department;
+            Department dept = {deptNo: uuid:createType4AsString(), ...deptInsert};
+            self.departments.add(dept);
+            deptNo = dept.deptNo;
+        }
+
+        Employee employee = {
+            empNo: uuid:createType4AsString(),
+            firstName: data.firstName,
+            lastName: data.lastName,
+            birthDate: data.birthDate,
+            gender: data.gender,
+            hireDate: data.hireDate,
+            deptNo: deptNo
+        };
+        self.employees.add(employee);
+        return employee;
     }
 }
