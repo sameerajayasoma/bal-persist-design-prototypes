@@ -74,7 +74,7 @@ type Title record {|
 table<Title> key(empNo, title, fromDate) titles = table [];
 
 type Workspace record {|
-    readonly string workspaceId = uuid:createType4AsString();
+    readonly string workspaceId;
     string workspaceType;
 
     Building building;
