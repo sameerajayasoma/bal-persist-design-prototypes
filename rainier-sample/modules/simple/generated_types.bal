@@ -18,6 +18,7 @@ public type Employee record {|
     time:Date hireDate;
 
     string deptNo; // department primary key
+    string workspaceId; // workspace primary key
 |};
 
 public type Department record {|
@@ -25,37 +26,51 @@ public type Department record {|
     string deptName;
 |};
 
+public type Building record {|
+    readonly string buildingCode;
+    string city;
+    string state;
+    string country;
+    string postalCode;
+|};
+
+// many-to-many (Department <-> Building) join table.
+// we need client resource for the join table to support insert/update/select/delete
+// no need separate records for insert and update.
+public type DepartmentBuilding record {|
+    string deptNo;
+    string buildingCode;
+|};
+
 public type Salary record {|
-    readonly string empNo;
+    readonly string empNo; // Employee primary key
     int salary;
     readonly time:Date fromDate;
     time:Date toDate;
 |};
 
 public type Title record {|
-    readonly string empNo;
+    readonly string empNo;  // Employee primary key
     readonly string title;
     readonly time:Date fromDate;
     time:Date toDate;
 |};
 
+type Workspace record {|
+    readonly string workspaceId;
+    string workspaceType;
+
+    string buildingCode; // Building primary key
+|};
+
 // Insert-related generated types ------ start ---------------
 
 // Used to insert a single department
-// TODO: Add support for inserting a single department with a list of employees
-//    i.e. a department with a list of employees ids or a list of employees records 
 public type DepartmentInsert record {|
-    string deptName;
-    EmployeeInsertWithoutDepartment[] employees?;
-|};
-
-// Used when creating an Employee with a new Department record
-public type DepartmentInsertWithoutEmployees record {|
     string deptName;
 |};
 
 // Used to insert a single employee with a department foreign key
-// TODO: Add support for inserting a single employee with a department record
 public type EmployeeInsert record {|
     string firstName;
     string lastName;
@@ -63,80 +78,47 @@ public type EmployeeInsert record {|
     Gender gender;
     time:Date hireDate;
 
-    // Existing department primary key or a new department record
-    // TODO: Should we create a record type for the department foreign key?
-    string|DepartmentInsertWithoutEmployees department;
-    SalaryInsertWithoutEmployee[] salaries?;
-    TitleInsertWithoutEmployee[] titles?;
+    // Existing department primary key. department record should exist with deptNo.
+    string deptNo;
+    // Existing workspace primary key. workspace record should exist with workspaceId.
+    string workspaceId;
 |};
 
-// Used when creating a department with a list of new employees records
-public type EmployeeInsertWithoutDepartment record {|
-    string firstName;
-    string lastName;
-    time:Date birthDate;
-    Gender gender;
-    time:Date hireDate;
-
-    SalaryInsertWithoutEmployee[] salaries?;
-    TitleInsertWithoutEmployee[] titles?;
-|};
-
-// Used when creating a salary entry with a new employee record
-public type EmployeeInsertWithoutSalaries record {|
-    string firstName;
-    string lastName;
-    time:Date birthDate;
-    Gender gender;
-    time:Date hireDate;
-
-    string|DepartmentInsertWithoutEmployees department;
-    TitleInsertWithoutEmployee[] titles?;
-|};
-
-public type EmployeeInsertWithoutTitles record {|
-    string firstName;
-    string lastName;
-    time:Date birthDate;
-    Gender gender;
-    time:Date hireDate;
-
-    string|DepartmentInsertWithoutEmployees department;
-    SalaryInsertWithoutEmployee[] salaries?;
+public type BuildingInsert record {|
+    string city;
+    string state;
+    string country;
+    string postalCode;
 |};
 
 public type SalaryInsert record {|
     int salary;
-    time:Date fromDate;
+    readonly time:Date fromDate;
     time:Date toDate;
 
-    string|EmployeeInsertWithoutSalaries employee;
-|};
-
-public type SalaryInsertWithoutEmployee record {|
-    int salary;
-    time:Date fromDate;
-    time:Date toDate;
+    // Existing employee primary key. employee record should exist with empNo.
+    string empNo;
 |};
 
 public type TitleInsert record {|
-    string title;
-    time:Date fromDate;
+    readonly string title;
+    readonly time:Date fromDate;
     time:Date toDate;
 
-    string|EmployeeInsertWithoutTitles employee;
+    // Existing employee primary key. employee record should exist with empNo.
+    string empNo;
 |};
 
-public type TitleInsertWithoutEmployee record {|
-    string title;
-    time:Date fromDate;
-    time:Date toDate;
+public type WorkspaceInsert record {|
+    string workspaceType;
+
+    // Existing building primary key. building record should exist with buildingCode.
+    string buildingCode;
 |};
 
 // Insert-related generated types ------ end ---------------
 
 // Update-related generated types
-// TODO: Add support for updating a single department with a list of employees
 public type DepartmentUpdate record {|
     string deptName?;
 |};
@@ -149,6 +131,14 @@ public type EmployeeUpdate record {|
     time:Date hireDate?;
 
     string deptNo?; // department primary key
+    string workspaceId?; // workspace primary key
+|};
+
+public type BuildingUpdate record {|
+    string city?;
+    string state?;
+    string country?;
+    string postalCode?;
 |};
 
 public type SalaryUpdate record {|
@@ -160,22 +150,8 @@ public type TitleUpdate record {|
     time:Date toDate?;
 |};
 
-public type EmployeeUniqueKey readonly & record {|
-    string empNo;
-|};
+type WorkspaceUpdate record {|
+    string workspaceType?;
 
-public type DepartmentUniqueKey readonly & record {|
-    string deptNo;
+    string buildingCode?; // Building primary key
 |};
-
-public type SalaryUniqueKey readonly & record {|
-    string empNo;
-    time:Date fromDate;
-|};
-
-public type TitleUniqueKey readonly & record {|
-    string empNo;
-    string title;
-    time:Date fromDate;
-|};
-

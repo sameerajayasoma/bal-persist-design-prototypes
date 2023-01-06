@@ -50,23 +50,23 @@ type Employee record {|
 table<Employee> key(empNo) employees = table[]; 
 
 type Salary record {|
-    readonly string empNo = uuid:createType4AsString();
+    readonly string empNo;
     int salary;
     readonly time:Date fromDate;
     time:Date toDate;
 
-    Employee employee;
+    Employee employee; // empNo is a foreign key, which is also part of composite primary key
 |};
 
 table<Salary> key(empNo, fromDate) salaries = table [];
 
 type Title record {|
-    readonly string empNo = uuid:createType4AsString();
+    readonly string empNo;
     readonly string title;
     readonly time:Date fromDate;
     time:Date toDate;
 
-    Employee employee;
+    Employee employee; // empNo is a foreign key, which is also part of composite primary key
 |};
 
 table<Title> key(empNo, title, fromDate) titles = table [];
