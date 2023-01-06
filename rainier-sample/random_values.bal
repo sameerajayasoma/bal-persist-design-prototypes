@@ -1,6 +1,34 @@
 import ballerina/random;
 import ballerina/time;
 
+string[] cities = ["New York", "Los Angeles", "Chicago", "Houston", "Philadelphia", "Phoenix", "San Antonio", "San Diego", "Dallas", "San Jose"];
+string[] countries = ["USA", "USA", "USA", "USA", "USA", "USA", "USA", "USA", "USA", "USA"];
+string[] states = ["NY", "CA", "TX", "FL", "IL", "PA", "OH", "GA", "NC", "MI"];
+string[] postalCodes = ["10001", "10002", "10003", "10004", "10005", "10006", "10007", "10008", "10009", "10010"];
+
+function randomCity() returns string|error {
+    return cities[check random:createIntInRange(0, cities.length() - 1)];
+}
+
+function randomCountry() returns string|error {
+    return countries[check random:createIntInRange(0, countries.length() - 1)];
+}
+
+function randomState() returns string|error {
+    return states[check random:createIntInRange(0, states.length() - 1)];
+}
+
+function randomPostalCode() returns string|error {
+    return postalCodes[check random:createIntInRange(0, postalCodes.length() - 1)];
+}
+
+function randomBuilding() returns BuildingInsert|error => {
+    city: check randomCity(),
+    country: check randomCountry(),
+    state: check randomState(),
+    postalCode: check randomPostalCode()
+};
+
 function getDepartmentNames() returns string[]|error => ["Finance", "Sales", "Marketing", "Human Resources", "Legal", "Operations", "IT"];
 
 function randomEmployee(string[] depts) returns EmployeeInsert|error => {
@@ -9,11 +37,12 @@ function randomEmployee(string[] depts) returns EmployeeInsert|error => {
     birthDate: check randomBirthDate(),
     gender: check randomGender(),
     hireDate: check randomHireDate(),
-    department: check randomDepartment(depts)
+    department: check randomDepartment(depts),
+    workspace: {workspaceId: "WS-1"}
 };
 
-function randomDepartment(string[] departments) returns string|error {
-    return departments[check random:createIntInRange(0, departments.length() - 1)];
+function randomDepartment(string[] departments) returns DepartmentInsertWithoutEmployees|error {
+    return {deptName: departments[check random:createIntInRange(0, departments.length() - 1)] };
 }
 
 function randomBirthDate() returns time:Date|error => {
