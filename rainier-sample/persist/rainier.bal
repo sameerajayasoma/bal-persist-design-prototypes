@@ -77,7 +77,7 @@ type Workspace record {|
     readonly string workspaceId = uuid:createType4AsString();
     string workspaceType;
 
-    Building location;
+    Building building;
     Employee employee;
 |};
 
