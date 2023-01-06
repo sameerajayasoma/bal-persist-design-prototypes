@@ -1,4 +1,3 @@
-import ballerina/uuid;
 import ballerina/time;
 
 enum Gender {
@@ -7,7 +6,8 @@ enum Gender {
 }
 
 type Building record {|
-    readonly string buildingCode = uuid:createType4AsString();
+    // We need to specify how bal/persist will generate the primary key.
+    readonly string buildingCode;
     string city;
     string state;
     string country;
@@ -18,10 +18,10 @@ type Building record {|
     Workspace[] workspaces;
 |};
 
-table<Building> key(buildingCode) offices = table [];
+table<Building> key(buildingCode) buildings = table [];
 
 type Department record {|
-    readonly string deptNo = uuid:createType4AsString();
+    readonly string deptNo;
     string deptName;
 
     // One-to-many relationship
@@ -32,7 +32,7 @@ type Department record {|
 table<Department> key(deptNo) departments = table []; 
 
 type Employee record {|
-    readonly string empNo = uuid:createType4AsString();
+    readonly string empNo;
     string firstName;
     string lastName;
     time:Date birthDate;
@@ -44,6 +44,8 @@ type Employee record {|
     // One-to-many relationship
     Salary[] salaries;
     Title[] titles;
+
+    // One-to-one relationship
     Workspace workspace;
 |};
 
@@ -80,10 +82,3 @@ type Workspace record {|
 |};
 
 table<Workspace> key(workspaceId) workspaces = table [];
-
-
-// TODO: Design an annotation on table variable to specify unique constranints, indexes, etc.
-// TODO: Create issues for language-level constraints
-//  1) Table key 
-//  2) Table 
-// TODO: Create issues for compiler-level issues when using types with module-level visibility in the client class. 
