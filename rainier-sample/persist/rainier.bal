@@ -26,7 +26,7 @@ type Department record {|
 
     // One-to-many relationship
     Employee[] employees;
-    Building[] buldings;
+    Building[] buildings;
 |};
 
 table<Department> key(deptNo) departments = table []; 
@@ -57,7 +57,7 @@ type Salary record {|
     readonly time:Date fromDate;
     time:Date toDate;
 
-    Employee employee;
+    Employee employee; // empNo is a foreign key, which is also part of composite primary key
 |};
 
 table<Salary> key(empNo, fromDate) salaries = table [];
@@ -68,7 +68,7 @@ type Title record {|
     readonly time:Date fromDate;
     time:Date toDate;
 
-    Employee employee;
+    Employee employee; // empNo is a foreign key, which is also part of composite primary key
 |};
 
 table<Title> key(empNo, title, fromDate) titles = table [];
