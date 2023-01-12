@@ -1,13 +1,29 @@
 import ballerina/uuid;
 import ballerina/io;
+import ballerina/time;
 
 public function queries() returns error? {
     RainierClient rc = new ();
-
     string employeeId = "40083df0-5a27-48a9-8e0d-6e70e0d6acbf";
+
     // Select just the employee 
     Employee? employee = check rc->/employees/[employeeId]();
     io:println(employee);
+
+    // Select just the employee's firstName, lastName, and birthDate
+    record {|
+        string firstName;
+        string lastName;
+        time:Date birthDate;
+    |}? empDetails = check rc->/employees/[employeeId]();
+    io:println(empDetails);
+
+    // Select the employee and their department details
+    record {|
+        *Employee;
+        Department department;
+    |}? employeeWithDept = check rc->/employees/[employeeId]();
+    io:println(employeeWithDept);
 
     // Select all employees in a department
     stream<Employee, error?> empStream = rc->/employees();
@@ -20,7 +36,6 @@ public function queries() returns error? {
 public function inserts() returns error? {
     RainierClient rc = new ();
 
-    // DepartmentInsert dept = ;
     Department dept = check rc->/departments.post({
         deptNo: "d010",
         deptName: "Customer Service"

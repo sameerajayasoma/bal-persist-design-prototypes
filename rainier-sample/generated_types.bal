@@ -28,6 +28,7 @@ public type Workspace record {|
 public type Department record {|
     readonly string deptNo;
     string deptName;
+
 |};
 
 public type Employee record {|
@@ -87,3 +88,88 @@ public type EmployeeUpdate record {|
     string workspaceId?;
 |};
 
+public type BuildingTargetType typedesc<BuildingWithRelations>;
+
+public type BuildingWithRelations record {|
+    readonly string buildingCode?;
+    string city?;
+    string state?;
+    string country?;
+    string postalCode?;
+
+    WorkspaceOptionalized[] workspaces?;
+|};
+
+public type WorkspaceTargetType typedesc<WorkspaceWithRelations>;
+
+public type WorkspaceWithRelations record {|
+    readonly string workspaceId?;
+    string workspaceType?;
+
+    BuildingOptionalized building?;
+    EmployeeOptionalized? employee?;
+|};
+
+public type DepartmentTargetType typedesc<DepartmentWithRelations>;
+
+public type DepartmentWithRelations record {|
+    readonly string deptNo?;
+    string deptName?;
+
+    string buildingCode?;
+
+    EmployeeOptionalized[] employees?;
+|};
+
+public type EmployeeTargetType typedesc<EmployeeWithRelations>;
+
+public type EmployeeWithRelations record {|
+    readonly string empNo?;
+    string firstName?;
+    string lastName?;
+    time:Date birthDate?;
+    Gender gender?;
+    time:Date hireDate?;
+
+    string deptNo?;
+    string workspaceId?;
+
+    DepartmentOptionalized department?;
+    WorkspaceOptionalized workspace?;
+|};
+
+
+public type BuildingOptionalized record {|
+    // *Building?
+    readonly string buildingCode?;
+    string city?;
+    string state?;
+    string country?;
+    string postalCode?;
+|};
+
+public type WorkspaceOptionalized record {|
+    readonly string workspaceId?;
+    string workspaceType?;
+
+    string buildingCode?;
+|};
+
+public type EmployeeOptionalized record {|
+    readonly string empNo?;
+    string firstName?;
+    string lastName?;
+    time:Date birthDate?;
+    Gender gender?;
+    time:Date hireDate?;
+
+    string deptNo?;
+    string workspaceId?;
+|};
+
+public type DepartmentOptionalized record {|
+    readonly string deptNo?;
+    string deptName?;
+
+    string buildingCode?;
+|};

@@ -6,6 +6,7 @@ enum Gender {
 }
 
 // Defines the entity type with the entity identity
+// the readonly fields defines the entity identity
 type Building record {|
     readonly string buildingCode;
     string city;
@@ -13,31 +14,26 @@ type Building record {|
     string country;
     string postalCode;
 
+    // one-to-many relationship
     Workspace[] workspaces;
 |};
-
-// Defines the entity collection/set with the entity identity
-// Also defines the resource used in the client API 
-table<Building> key(buildingCode) buldings = table[];
 
 type Workspace record {|
     readonly string workspaceId;
     string workspaceType;
 
     Building location;
+    // one-to-one relationship
     Employee? employee;
 |};
-
-table<Workspace> key(workspaceId) workspaces = table[];
 
 type Department record {|
     readonly string deptNo;
     string deptName;
 
+    // one-to-many relationship
     Employee[] employees;
 |};
-
-table<Department> key(deptNo) departments = table[];
 
 type Employee record {|
     readonly string empNo;
@@ -50,5 +46,3 @@ type Employee record {|
     Department department;
     Workspace workspace;
 |};
-
-table<Employee> key(empNo) employees = table[];
